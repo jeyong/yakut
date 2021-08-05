@@ -5,12 +5,9 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Forum](https://img.shields.io/discourse/users.svg?server=https%3A%2F%2Fforum.uavcan.org&color=1700b3)](https://forum.uavcan.org)
 
-Yakút is a simple cross-platform command-line interface (CLI) tool for diagnostics and debugging of
-[UAVCAN](https://uavcan.org) networks.
-By virtue of being based on [PyUAVCAN](https://github.com/UAVCAN/pyuavcan),
-Yakut supports all UAVCAN transports (UDP, serial, CAN, ...)
-and is compatible with all major features of the protocol.
-It is designed to be usable with GNU/Linux, Windows, and macOS.
+Yakút 간단한 커맨드 라인 인터페이스 도구로 UAVCAN 네트워크 진단 및 디버깅에 사용한다.
+[PyUAVCAN](https://github.com/UAVCAN/pyuavcan) 기반으로 모든 UAVCAN transports(UDP, serial, CAN, ...)을 지원하며 프로토콜의 모든 주요 특징과 호환된다.
+Linux, Windows, macOS에서 사용이 가능하다.
 
 <img src="/docs/monitor.png" alt="yakut monitor">
 
@@ -18,88 +15,71 @@ Ask questions and get assistance at [forum.uavcan.org](https://forum.uavcan.org/
 
 ## Installing
 
-First, make sure to [have Python installed](https://docs.python.org/3/using/index.html).
-Windows users are recommended to grab the official distribution from Windows Store.
-Yakut requires **Python 3.7 or newer**.
+먼저 **Python 3.7 이후 버전** 이 설치되어 있어야 한다. 
 
-Install Yakut: **`pip install yakut`**
+Yakut 설치 : **`pip install yakut`**
 
-Afterward do endeavor to read the docs: **`yakut --help`**
+문서 읽기 : **`yakut --help`**
 
-Check for new versions every now and then: **`pip install --upgrade yakut`**
+새로운 버전 체크 : **`pip install --upgrade yakut`**
 
-Installation & configuration screencasts for Windows and GNU/Linux are
-[available on the forum](https://forum.uavcan.org/t/screencast-of-installing-configuring-yakut/1197).
+Windows, Linux에서 설치 및 설정 : [포럼](https://forum.uavcan.org/t/screencast-of-installing-configuring-yakut/1197)
 
 ### GNU/Linux
 
-In order to use joysticks you may need to manually install SDL2.
-In most distros the package name begins with `libsdl2`.
-MIDI controller support may require the ALSA API library (with header files) to be installed as well.
-
-### Common issues
-
-If you are experiencing illegal instruction faults on aarch64, upgrade NumPy and Cython: `pip install -U numpy cython`.
+조이스틱 사용을 원하는 경우 SDL2 수동 설치.
+일반적으로 패키지 이름은 `libsdl2`이다.
+MIDI 제어기는 ALSA API library가 필요할 수도 있다.
 
 ## Invoking commands
 
-Any option can be supplied either as a command-line argument or as an environment variable named like
-`YAKUT_[subcommand_]option`.
-If both are provided, command-line options take precedence over environment variables.
-You can use this feature to configure desired defaults by exporting environment variables from the
-rc-file of your shell (for bash/zsh this is `~/.bashrc`/`~/.zshrc`, for PowerShell see `$profile`).
+옵션으로 명령 라인 인자 혹은 환경 변수를 줄 수 있으며 이 경우 형식은 `YAKUT_[subcommand_]option` 와 같다.
+만약 2개 모두 필요한 경우 커맨드 라인 옵션이 먼저 오고 이후에 환경 변수가 온다.
+기본 설정으로 사용하려면 사용하는 쉘에서 환경 변수를 export해서 설정할 수 있다.
 
-Options for the main command shall be specified before the subcommand when invoking Yakut:
+Yakut를 호출할때 메인 명령에 대한 옵션은 서브 커맨드 전에 지정해야 한다. :
 
 ```bash
 yakut --path=/the/path compile path/to/my_namespace --output=destination/directory
 ```
 
-In this example, the corresponding environment variables are `YAKUT_PATH` and `YAKUT_COMPILE_OUTPUT`.
+이 예제에서 관련 환경 변수는 `YAKUT_PATH` 와 `YAKUT_COMPILE_OUTPUT` 이다.
 
-Any subcommand like `yakut compile` can be used in an abbreviated form like `yakut com`
-as long as the resulting abbreviation is unambiguous.
+`yakut compile`과 같은 서브 커맨드는 짧게 `yakut com`로 사용할 수 있다.
 
-There is a dedicated `--help` option for every subcommand.
+모든 서브 커맨드에 대해서 `--help` 옵션이 있다.
 
-Yakut may also be invoked via its alias **`y`** as long as this name does not conflict with another installed program.
+Yakut는 다른 설치 프로그램과 충돌이 되지 않는다면 **`y`**와 같은 alias로 호출할 수도 있다.
 
 ## Compiling DSDL
 
-Suppose we have our custom DSDL namespace that we want to use.
-First, it needs to be *compiled*:
+사용할려는 custom DSDL 네임스페이스을 가지고 있다고 가정해보자.
+먼저 *compiled*이 필요하다:
 
 ```bash
 yakut compile ~/custom_data_types/sirius_cyber_corp
 ```
 
-Most of the commands require the standard namespace to be available,
-so let's compile it too, along with the regulated namespace:
+명령의 대부분은 유효한 표준 네임스페이스가 필요하고 역시 컴파일이 필요하다. :
 
 ```bash
 yakut compile  ~/public_regulated_data_types/uavcan  ~/public_regulated_data_types/reg
 ```
 
-Compilation outputs will be stored in the current working directory, but it can be overridden if needed
-via `--output` or `YAKUT_COMPILE_OUTPUT`.
-Naturally, Yakut needs to know where the outputs are located to use them;
-by default it looks in the current directory.
-You can specify additional search locations using `--path` or `YAKUT_PATH`.
+컴파일 출력은 현재 작업 디렉토리에 저장되지만 필요하다면 `--output` 나 `YAKUT_COMPILE_OUTPUT`로 변경할 수 있다.
+Yakut은 출력 결과물이 어디에 위치하는지 알고 있어야 한다;
+기본적으로는 현재 디렉토리에서 찾는다.
+추가로 `--path` 나 `YAKUT_PATH`를 사용해서 위치를 검색할 수 있다.
 
-A question one is likely to ask here is:
-*Why don't you ship precompiled regulated DSDL together with the tool?*
-Indeed, that would be trivial to do, but we avoid that on purpose to emphasize our commitment to
-supporting vendor-specific and regulated DSDL at the same level.
-In the past we used to give regulated namespaces special treatment,
-which caused our users to acquire misconceptions about the purpose of DSDL.
-Specifically, there have been forks of the standard namespace extended with vendor-specific types,
-which is harmful to the ecosystem.
+여기서 올 수 있는 첫번째 질문:
+*미리 컴파일된 regulated DSDL를 tool과 함께 배포하지 않는가?*
+사실 그렇게 하는 것은 그리 어렵지 않다. 하지만 벤더 지정과 정규 DSDL을 동일한 레벨에서 지원하기 위한 약속을 강조할려는 목적으로 피하고 있다.
+과거에 정규 네임스페이스를 특별히 취급했었는데 이로 인해 DSDL의 목적을 잘못 이해하게 되었었다.
+특히 벤더 지정 타입으로 확장된 표준 네임스페이스의 fork는 에코시스템에 좋지 않은 영향을 미친다.
 
-Having to manually compile the regulated namespaces is not an issue because it is just a single command to run.
-You may opt to keeping compiled namespaces that you use often somewhere in a dedicated directory and put
-`YAKUT_PATH=/your/directory` into your shell's rc-file so that you don't have to manually specify
-the path when invoking Yakut.
-Similarly, you can configure it to use that directory as the default destination for compiled DSDL:
+정규 네임스페이스를 수동으로 컴파일하는 것은 이슈가 되지 않는다. 왜냐하면 실행할 하나의 명령이기 때문이다.
+컴파일된 네임스페이스를 유지하기로 선택해서 특정 디렉토리에 넣어 두고 `YAKUT_PATH=/your/directory`를 쉘 rc파일에 추가하면 Yakut를 호출할때 해당 path를 수동으로 지정하지 않아도 된다.
+유사하게 컴파일된 DSDL을 위한 기본 목적지로 해당 디렉토리를 사용하기 위해서 이를 설정할 수 있다.:
 
 ```bash
 # bash/zsh on GNU/Linux or macOS
@@ -113,27 +93,25 @@ $env:YAKUT_COMPILE_OUTPUT="$env:APPDATA\Yakut"
 $env:YAKUT_PATH="$env:YAKUT_COMPILE_OUTPUT"
 ```
 
-So that you say simply `yakut compile path/to/my_namespace`
-knowing that the outputs will be always stored to and read from a fixed place unless you override it.
+단순하게 `yakut compile path/to/my_namespace`하면 출력물이 항상 특정 장소로부터 읽고 쓰기가 가능하게 된다.
 
 ## Communicating
 
-Commands that access the network need to know how to do so.
-There are two ways to configure that:
-pass *UAVCAN registers* via environment variables (this is the default),
-or pass an initialization expression via `--transport`/`YAKUT_TRANSPORT` (in which case the registers are ignored).
-The latter is not recommended for general use so we'll focus on the first one.
+네트워크에 접속하는 명령은 어떻게 그렇게 동작하는지 알아야 한다.
+이를 설정하는 2가지 방식:
+*UAVCAN registers*를 환경 변수를 통해서 전달(이것이 기본)하거나
+ 혹은 초기에 `--transport`/`YAKUT_TRANSPORT`를 통해서 전달한다.(이 경우 해당 레지스터들은 무시된다)
+후자는 일반적으로 추천하지 않으므로 첫번째 것에 초점을 둔다.
 
-UAVCAN registers are named values that contain various configuration parameters of a UAVCAN application/node.
-They are extensively described in the [UAVCAN Specification](https://uavcan.org/specification).
-When starting a new process, it is possible to pass arbitrary registers via environment variables.
+UAVCAN 레지스터는 UAVCAN 어플리케이션/노드의 여러 설정 파라미터를 포함하고 있는 이름있는 값이다.
+이것들은 [UAVCAN Specification](https://uavcan.org/specification)에서 추가로 설정한다.
+새로운 프로세스가 구동되면, 환경 변수를 통해서 임의의 레지스터를 전달하는 것이 가능하다.
 
-There are certain registers that are looked at by UAVCAN nodes to determine how to connect to the network.
-Some of them are given below, but the list is not exhaustive.
-The full description of supported registers is available in the API documentation for
-[`pyuavcan.application.make_transport()`](https://pyuavcan.readthedocs.io/en/stable/api/pyuavcan.application.html#pyuavcan.application.make_transport).
+네트워크에 연결하는 방법을 결정하기 위해서 UAVCAN 노드가 지켜보는 레지스터들이 있다.
+이들 중에 일부는 아래와 같다.
+지원하는 레지스터의 모든 설명은 [`pyuavcan.application.make_transport()`](https://pyuavcan.readthedocs.io/en/stable/api/pyuavcan.application.html#pyuavcan.application.make_transport)을 위한 API 문서에서 확인할 수 있다.
 
-If the available registers define more than one transport configuration, a redundant transport will be initialized.
+만약 유효한 레지스터들이 1개 트랜스포트 이상의 설정을 가진다면 추가 트랜스포트는 초기화 된다.
 
 Transport |Register name        |Register type  |Environment variable name|Semantics                                          |Example environment variable value
 ----------|---------------------|---------------|-------------------------|---------------------------------------------------|------------------------------------
@@ -147,9 +125,9 @@ Loopback  |`uavcan.loopback`    |`bit[1]`       |`UAVCAN__LOOPBACK`       |Use l
 
 ### Subscribing to subjects
 
-Subscribe to subject 33 of type `uavcan.si.unit.angle.Scalar.1.0` as shown below;
-notice how we specify the subject-ID before the data type name.
-You will see output if there is a publisher on this subject (more on this in the next section).
+`uavcan.si.unit.angle.Scalar.1.0` 타입의 subject 33을 subscribe는 아래와 같다;
+데이터 타입 이름(data type name) 전에 subject-ID를 지정하는 방법을 보자.
+이 subject에 대한 publisher가 있다면 출력을 보자.(다음 섹션에서 추가로 다룬다)
 
 ```bash
 $ export UAVCAN__UDP__IFACE=127.63.0.0
@@ -175,7 +153,7 @@ $ yakut sub 33:uavcan.si.unit.angle.Scalar.1.0
 
 ### Publishing messages
 
-Publishing two messages synchronously twice (four messages total):
+2개 메시지를 동시에 2번 publish(총 4개 메시지):
 
 ```bash
 export UAVCAN__UDP__IFACE=127.63.0.0
@@ -184,30 +162,25 @@ yakut pub -N2 33:uavcan.si.unit.angle.Scalar.1.0 'radian: 2.31' \
                  uavcan.diagnostic.Record.1.1    'text: "2.31 rad"'
 ```
 
-We did not specify the subject-ID for the second subject, so Yakut defaulted to the fixed subject-ID.
+2번째 subject를 위해서 subject-ID를 지정하지 않았지만 고정된 subject-ID가 기본이 된다.
 
-The above example will publish constant values which is rarely useful.
-You can define arbitrary Python expressions that are evaluated by Yakut before publication.
-Such expressions are entered as strings marked with [YAML tag](https://yaml.org/spec/1.2/spec.html#id2761292) `!$`.
-There may be an arbitrary number of such expressions in a YAML document,
-and their results may be arbitrary as long as the final structure can initialize the specified message.
-The following example will publish a sinewave with frequency 1 Hz, amplitude 10 meters:
+위 예제에서 쓸모없는 일정한 값을 publish한다.
+publish하기 전에 Yakut가 수행하는 임의의 Python 코드를 정의할 수 있다.
+이런 expression들은 [YAML tag](https://yaml.org/spec/1.2/spec.html#id2761292) `!$` 로 마킹된 문자열로 들어가 있다.
+YAML 문서에는 임의 개수의 expression들이 있을 수 있고 결과적으로 마지막 구조체가 지정한 메시지로 초기화하고 결과는 임의의 값이 된다.
+다음 예제는 1Hz 주기, 10 미터 진폭의 싸인파를 publish한다.:
 
 ```bash
 yakut pub -T 0.01 1234:uavcan.si.unit.length.Scalar.1.0 '{meter: !$ "sin(t * pi * 2) * 10"}'
 ```
 
-Notice that we make use of entities like the variable `t` or the standard function `sin` in the expression.
-You will see the full list of available entities if you run `yakut pub --help`.
+변수 `t`와 같은 엔트티를 사용하거나 expression에서 표준 `sin` 함수를 사용한다.
+`yakut pub --help`를 사용하면 유효한 엔트티의 전체 목록을 보도록 하자.
 
-One particularly important capability of this command is the ability to read data from connected
-joysticks or MIDI controllers.
-It allows the user to control UAVCAN processes or equipment in real time, simulate sensor feeds, etc.
-Function `A(x,y)` returns the normalized value of axis `y` from connected controller `x`
-(for full details see `yakut pub --help`);
-likewise, there is `B(x,y)` for push buttons and `T(x,y)` for toggle switches.
-The next example will publish 3D angular velocity setpoint, thrust setpoint, and the arming switch state,
-allowing the user to control these parameters interactively:
+이 명령의 특별한 기능은 연결된 조이스틱이나 MIDI 제어기로부터 데이터를 읽을 수 있다는 것이다.
+사용자가 UAVCAN 프로세스나 장치를 실시간으로 제어할 수 있게 한다.
+함수 `A(x,y)`는 연결된 제어기 `x`로부터 축 `y`의 normalized 값을 반환한다.(상세한 내용은 `yakut pub --help` 참고) 유사하게 push 버튼은 `B(x,y)` 이고 toggle 스위치는 `T(x,y)`이다.
+다음 예제는 3D 각속도 setpoint, thrust setpoint, arming 스위치 상태를 publish하여 사용자가 상호작용으로 이 파라미터를 제어할 수 있게 한다.:
 
 ```bash
 yakut pub -T 0.1 \
@@ -216,18 +189,18 @@ yakut pub -T 0.1 \
     7:uavcan.primitive.scalar.Bit.1.0 'value: !$ T(1,5)'
 ```
 
-The list of connected controllers and how their axes are mapped can be seen using `yakut joystick`,
-as shown in the video:
+연결된 제어기의 목록과 그 축들의 매핑은 `yakut joystick`를 사용해서 볼 수 있다. 아래 비디오 참고:
 
 [![yakut joystick](https://img.youtube.com/vi/YPr98KM1RFM/maxresdefault.jpg)](https://www.youtube.com/watch?v=YPr98KM1RFM)
 
-Here is an example where a MIDI controller is used to interactively change the frequency and amplitude of a sinewave:
+
+MIDI 제어기 예제는 사인파의 주파수와 진폭을 변경하는 예제이다.:
 
 [![yakut publish](https://img.youtube.com/vi/DSsI882ZYh0/maxresdefault.jpg)](https://www.youtube.com/watch?v=DSsI882ZYh0)
 
 ### Invoking RPC-services
 
-Given custom data types:
+custom 데이터 타입이 주어지면:
 
 ```shell
 # sirius_cyber_corp.PerformLinearLeastSquaresFit.1.0
@@ -246,7 +219,7 @@ float16 y
 @sealed
 ```
 
-Suppose that there is node 42 that serves `sirius_cyber_corp.PerformLinearLeastSquaresFit.1.0` at service-ID 123:
+service-ID 123에 `sirius_cyber_corp.PerformLinearLeastSquaresFit.1.0`를 제공하는 node 42가 있다고 가정한다.:
 
 ```bash
 $ export UAVCAN__UDP__IFACE=127.63.0.0
@@ -261,13 +234,11 @@ $ yakut call 42 123:sirius_cyber_corp.PerformLinearLeastSquaresFit.1.0 'points: 
 
 ## Monitoring the network
 
-The command `yakut monitor` can be used to display *all* activity on the network in a compact representation.
-It tracks online nodes and maintains real-time statistics on all transfers exchanged between each node
-on the network.
-It may also be able to detect some common network configuration issues like zombie nodes
-(nodes that do not publish `uavcan.node.Heartbeat`).
+`yakut monitor` 명령은 네트워크 상에 있는 모든 동작을 간략히 표시할때 사용한다.
+연결된 노드를 추적하고 네트워크 상에 각 노드들 사이에 교환되는 모든 전송을 실시간 통계를 구한다.
+좀비 노드와 같은 일반적인 네트워크 설정 문제를 검출하는데 사용할 수도 있다.(`uavcan.node.Heartbeat`를 publish하지 않는 노드들)
 
-Read `yakut monitor --help` for details.
+상세한 내용은 `yakut monitor --help` 참고.
 
 ```bash
 $ export UAVCAN__CAN__IFACE="socketcan:can0 socketcan:can1 socketcan:can2"  # Triply-redundant UAVCAN/CAN
@@ -278,33 +249,29 @@ $ y mon                                         # Abbreviation of "yakut monitor
 
 <img src="/docs/monitor.gif" alt="yakut monitor">
 
-The monitor can be an anonymous node or it can be given a node-ID of its own.
-In the latter case it will actively query other nodes using the standard introspection services.
+모니터는 익명 노드이거나 자신에게 node-ID를 부여할 수 있다.
+후자의 경우 표준 회고 서비스를 사용해서 적극적으로 다른 노드들에게 쿼리를 날린다.
 
-Some transports, UAVCAN/UDP in particular, require special privileges to run this tool due to the security
-implications of low-level packet capture.
+일부 트랜스포트들 그중에서 특히 UAVCAN/UDP는 이 도구를 실행시키기 위해서 특별한 권한이 필요하다. 이유는 low-level 패킷을 캡쳐를 위한 보안 때문이다.
 
 ## Updating node software
 
-The file server command can be used to serve files,
-run a plug-and-play node-ID allocator (some embedded bootloader implementations require that),
-and automatically send software update requests `uavcan.node.ExecuteCommand` to nodes whose software is old.
+파일 서버 명령은 파일을 제공, PnP node-ID 할당 실행(일부 임베디드 bootloader 구현이 필요), 자동으로 sw 업데이트 요청 `uavcan.node.ExecuteCommand`를 노드들에게 전송한다.
 
-To demonstrate this capability, suppose that the network contains the following nodes:
+이런 기능을 보여주기 위해 네트워크는 다음과 같은 노드들을 포함하고 있다고 가정한다:
 
 - nodes 1, 2 named `com.example.foo`, software 1.0
 - nodes 3, 4 named `com.example.bar`, hardware v4.2, software v3.4
 - node 5 named `com.example.baz`
 
-Software updates are distributed as atomic package files.
-In case of embedded systems, the package is usually just the firmware image,
-possibly compressed or amended with some metadata.
-For the file server this is irrelevant since it never looks inside the files it serves.
-However, the name is relevant as it shall follow a particular pattern to make the server recognize
-the file as a software package.
-The full specification is given in the command help: `yakut file-server --help`.
+SW 업데이트는 atomic package 파일처럼 배포된다.
+임베디드 시스템의 경우 이런 패키지는 보통 펌웨어 이미지이고 압축되거나 일부 메타데이터를 가질 수도 있다.
+파일 서버가 파일 내부를 들여다 보지 않기 떄문에 파일 서버와는 무관하다.
+하지만 파일 이름은 해당 파일의 패턴에 따라서 서버가 인지할 수 있게 만들 수 있으므로 
+하지만 sw 패키지가 가지는 이름은 특정 패턴을 따라서 서버가 파일을 인지하도록 만들 수 있다.
+명령 help로 전체 스펙 확인 : `yakut file-server --help`
 
-Suppose that we have the following packages that we need to deploy:
+배포할 패키지가 다음과 같다고 가정:
 
 - v1.1 for nodes `com.example.foo` with any hardware
 - v3.3 for nodes `com.example.bar` with hardware v4.x
@@ -318,9 +285,8 @@ com.example.bar-4-3.3.app.pkg     # Hardware v4.x
 com.example.bar-5.6-3.5.app.bin   # Hardware v5.6 only
 ```
 
-The server rescans its root directory whenever a new node is found online,
-meaning that packages can be added/removed at runtime and the server will pick up the changes on the fly.
-Launch the server:
+새로운 노드가 네트워크에 발견되면 서버는 root 디렉토리를 스캔한다. 이 말은 런타임에 해당 패키지가 추가/삭제되고 서버는 비행중에 변경을 받아들일 수 있다.
+서버 실행:
 
 ```shell
 $ export UAVCAN__UDP__IFACE=127.63.0.0
@@ -328,23 +294,18 @@ $ export UAVCAN__NODE__ID=42
 $ yakut file-server --plug-and-play=allocation_table.db --update-software
 ```
 
-If there are any nodes online (or if they join the network later),
-the server will check the version of each by sending `uavcan.node.GetInfo`,
-and if a newer package is available locally, it will request the node to install it
-by sending `uavcan.node.ExecuteCommand`.
+어떤 노드가 네트워크에 추가되면 서버는 `uavcan.node.GetInfo` 를 보내서 각 버전을 체크한다. 만약 새로운 패키지가 유효하면 해당 노드에게 `uavcan.node.ExecuteCommand`를 보내서 설치요청을 할 수 있다.
 
-In this specific case, the following will happen:
+이런 특수한 경우에 다음이 발생한다:
 
-- Nodes 1 and 2 will be updated to v1.1.
-- Nodes 3 and 4 will not be updated because the newer package v3.5 is incompatible with hardware v4.2,
-  and the compatible version v3.3 is too old.
-- Node 5 will not be updated because there are no suitable packages.
+- Nodes 1와 2가 v1.1로 업데이트된다.
+- Nodes 3과 4는 업데이트 되지 않는다. 왜냐하면 새로운 패키지 v3.5는 하드웨어 v4.2와 호환되지 않고 호환 버전인 v3.3은 너무 오래된 버전이다.
+- Node 5는 업데이트 되지 않는다. 왜냐하면 적절한 패키지가 없다.
 
-Add `--verbose` to see how exactly the decisions are made.
+`--verbose`를 추가하여 정확하게 결정이 어떻게 내려졌는지 확인한다.
 
-This command can be used to implement **automatic network-wide configuration management**.
-Start the server and leave it running.
-Store all relevant packages into its root directory.
-When a node is connected or restarted, the server will automatically compare the version of its software
-against the local files and perform an update if necessary.
-Therefore, the entire network will be kept up-to-date without manual intervention.
+이 명령은 **automatic network-wide configuration management**를 실행하기 위해서 사용할 수 있다.
+서버를 시작하고 실행된 상태로 남겨둔다.
+모든 관련 패키지를 루트 디렉토리로 저장한다.
+노드가 연결되고 재시작되면 서버는 자동으로 로컬 파일과 업데이트를 수행할 파일의 버전을 비교한다.
+따라서 전체 네트워크는 자동으로 최신으로 유지될 수 있다.
